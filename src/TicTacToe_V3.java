@@ -115,7 +115,7 @@ public class TicTacToe_V3 {
 
     private void congratulations() throws InterruptedException, BrokenBarrierException {
         control.await();
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < 9; i++) {
             buttonList[i].setEnabled(false);
         }
         JFrame message = new JFrame();
