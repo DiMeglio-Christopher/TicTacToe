@@ -8,14 +8,14 @@ import java.util.concurrent.CyclicBarrier;
 
 public class TicTacToe_V3 {
     private static Boolean playAgain = false;
-    private String turn;
-    private String option;
-    private int turnNumber;
     private final JFrame window;
     private final JButton[] buttonList;
     private final int[][] board;
-    private String winner;
     private final CyclicBarrier control;
+    private String turn;
+    private String option;
+    private int turnNumber;
+    private String winner;
 
     private TicTacToe_V3() {
         this.turn = "X";
@@ -143,6 +143,7 @@ public class TicTacToe_V3 {
     }
 
     private void computer() {
+        System.out.println(Thread.currentThread());
         Random rand = new Random();
         if (turnNumber == 1 && !buttonList[4].isEnabled()) {
             int[] correctMoves = {0, 2, 6, 8};
@@ -212,49 +213,49 @@ public class TicTacToe_V3 {
         }
     }
 
+    private void uiHandlerThread(ActionEvent e) throws InterruptedException {
+        Thread worker = new Thread(() -> {
+            JButton button = (JButton) e.getSource();
+            try {
+                if (button == buttonList[9]) {
+                    option = "player";
+                    control.await();
+                }
+                if (button == buttonList[10]) {
+                    option = "cpu";
+                    control.await();
+                }
+                for (int i = 0; i < 9; i++) {
+                    if (button == buttonList[i]) {
+                        button.setEnabled(false);
+                        button.setText(turn);
+                        int x = i / 3;
+                        int y = i % 3;
+                        board[x][y] = turn.equals("X") ? 1 : -1;
+                        changeTurn();
+                    }
+                }
+                if (button.getText().equals("Play Again")) {
+                    playAgain = true;
+                    window.dispose();
+                    control.await();
+                    control.reset();
+                }
+            } catch (InterruptedException | BrokenBarrierException e1) {
+                e1.printStackTrace();
+            }
+        });
+        worker.start();
+        Thread.sleep(0, 1);
+    }
+
     class MyActionListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            JButton button = (JButton) e.getSource();
-            if (button == buttonList[9]) {
-                option = "player";
-                try {
-                    control.await();
-                } catch (InterruptedException | BrokenBarrierException e1) {
-                    e1.printStackTrace();
-                }
-            }
-            if (button == buttonList[10]) {
-                option = "cpu";
-                try {
-                    control.await();
-                } catch (InterruptedException | BrokenBarrierException e1) {
-                    e1.printStackTrace();
-                }
-            }
-            for (int i = 0; i < 9; i++) {
-                if (button == buttonList[i]) {
-                    button.setEnabled(false);
-                    button.setText(turn);
-                    int x = i / 3;
-                    int y = i % 3;
-                    board[x][y] = turn.equals("X") ? 1 : -1;
-                    try {
-                        changeTurn();
-                    } catch (InterruptedException | BrokenBarrierException e1) {
-                        e1.printStackTrace();
-                    }
-                }
-            }
-            if (button.getText().equals("Play Again")) {
-                playAgain = true;
-                window.dispose();
-                try {
-                    control.await();
-                } catch (InterruptedException | BrokenBarrierException e1) {
-                    e1.printStackTrace();
-                }
-                control.reset();
+            try {
+                uiHandlerThread(e);
+            } catch (InterruptedException e1) {
+                e1.printStackTrace();
             }
         }
     }
