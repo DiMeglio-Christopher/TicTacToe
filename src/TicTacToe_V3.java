@@ -142,13 +142,16 @@ public class TicTacToe_V3 {
         message.dispose();
     }
 
-    private void computer() {
+    private void computer() throws InterruptedException {
         Random rand = new Random();
         if (turnNumber == 1 && !buttonList[4].isEnabled()) {
             int[] correctMoves = {0, 2, 6, 8};
             buttonList[correctMoves[rand.nextInt(3)]].doClick();
-        } else {
+            return;
+        }
+        if (buttonList[4].isEnabled()) {
             buttonList[4].doClick();
+            return;
         }
         int xRowPos = 0;
         int yRowPos = 0;
@@ -182,7 +185,7 @@ public class TicTacToe_V3 {
                     antiDiagPos = i;
                 }
                 if (turn.equals("O") && j == 2) {
-                    if (Math.abs(diagSum) == 2) {
+                    if (Math.abs(diagSum) == 2 && i == 2) {
                         buttonIndex = (diagPos * 3) + diagPos;
                         buttonList[buttonIndex].doClick();
                         System.out.println("Stop Diag: " + buttonIndex);
@@ -198,7 +201,7 @@ public class TicTacToe_V3 {
                         buttonIndex = (yColumnPos * 3) + xColumnPos;
                         buttonList[buttonIndex].doClick();
                         System.out.println("Stop Column: " + buttonIndex);
-                    } else if (i == 2) {
+                    } else if (i >= 2) {
                         int index;
                         while (turn.equals("O")) {
                             int[] correctMoves = {1, 3, 5, 7};
