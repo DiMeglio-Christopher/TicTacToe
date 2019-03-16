@@ -262,7 +262,8 @@ public class TicTacToe {
                         System.out.println("Stop Column: " + buttonIndex);
                     } else if (!x.edgeStopped && i >= 2) {
                         stopEdgeCase();
-                    } else if (i >= 2) {
+                    }
+                    if (i >= 2 && x.turn.equals("O")) {
                         int index;
                         while (x.turn.equals("O")) {
                             int[] correctMoves = {1, 3, 5, 7};
